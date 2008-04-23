@@ -53,7 +53,7 @@ You can fetch the source from either:
 
 * github (edge): "http://github.com/jherdman/viking/tree/master":edge_scm
 
-<pre>git clone git://github.com/jherdman/viking-gem.git</pre>
+<pre>git clone git://github.com/jherdman/viking.git</pre>
 
 h3. Build and test instructions
 
