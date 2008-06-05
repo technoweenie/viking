@@ -12,11 +12,11 @@ require 'viking'
 # See http://blog.jayfields.com/2007/11/ruby-testing-private-methods.html
 class Class
   def publicize_methods(instance=nil)
-    saved_private_instance_methods = self.private_instance_methods
-    self.class_eval { public *saved_private_instance_methods }
+    saved_protected_instance_methods = self.protected_instance_methods
+    self.class_eval { public *saved_protected_instance_methods }
     yield(instance)
   ensure
-    self.class_eval { private *saved_private_instance_methods }
+    self.class_eval { protected *saved_protected_instance_methods }
   end
 end
 

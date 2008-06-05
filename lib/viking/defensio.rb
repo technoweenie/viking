@@ -21,7 +21,8 @@ module Viking
     class << self
       attr_accessor :host, :port, :api_version, :standard_headers, :service_type
     end
-    
+
+    attr_accessor :verify_options
     attr_accessor :proxy_port, :proxy_host
     attr_reader   :last_response
 
@@ -336,37 +337,26 @@ module Viking
       ) << '.yaml'
     end
 
-    protected
+  protected
+    def call_defensio(action, params={})
+      params.update('owner-url' => options[:blog] || options[:owner_url])
+      data = params.dasherize_keys.to_query
+      resp = http_instance.post url(action), data, self.class.standard_headers
+      log_request(url(action), data, resp)
+      process_response_body(resp.body)
+    end
 
-      def call_defensio(action, params={})
-        resp = defensio_http.post(
-          url(action), 
-          data(params), 
-          self.class.standard_headers
-        )
-        log_request(url(action), data, resp)
-        process_response_body(resp.body)
-      end
-      
-      def defensio_http
-        http = Net::HTTP.new self.class.host, self.class.port, options[:proxy_host], options[:proxy_port]
-        http.read_timeout = http.open_timeout = Viking.timeout_threshold
-        http
-      end
-      
-      def data(params={})
-        params.update('owner-url' => options[:blog] || options[:owner_url])
-        params.dasherize_keys.to_query
-      end
-      
-    private
-      attr_accessor :verify_options
-      
-      def process_response_body(response_body)
-        data = YAML.load(response_body)
-        return data['defensio-result'].symbolize_keys
-      rescue
-        { :data => data, :status => 'fail' }
-      end
+    def http_instance
+      http = Net::HTTP.new self.class.host, self.class.port, options[:proxy_host], options[:proxy_port]
+      http.read_timeout = http.open_timeout = Viking.timeout_threshold
+      http
+    end
+
+    def process_response_body(response_body)
+      data = YAML.load(response_body)
+      return data['defensio-result'].symbolize_keys
+    rescue
+      { :data => data, :status => 'fail' }
+    end
   end
 end
