@@ -10,7 +10,7 @@ $:.unshift(File.dirname(__FILE__)) unless
 # framework initialization. Rails initializers, for instance, work great for 
 # this. An example of such an initializer would be as follows:
 # 
-#   Viking.default_engie = 'defensio'
+#   Viking.default_engine = 'defensio'
 #   Viking.connect_options = { :api_key => '1234abc' }
 # 
 # From this point out, Viking should have everything it needs to access the 
