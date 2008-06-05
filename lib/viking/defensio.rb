@@ -349,19 +349,14 @@ module Viking
       end
       
       def defensio_http
-        Net::HTTP.new(
-          self.class.host, 
-          self.class.port, 
-          options[:proxy_host], 
-          options[:proxy_port]
-        )
+        http = Net::HTTP.new self.class.host, self.class.port, options[:proxy_host], options[:proxy_port]
+        http.read_timeout = http.open_timeout = Viking.timeout_threshold
+        http
       end
       
       def data(params={})
-        params.
-          update('owner-url' => options[:blog] || options[:owner_url]).
-          dasherize_keys.
-          to_query
+        params.update('owner-url' => options[:blog] || options[:owner_url])
+        params.dasherize_keys.to_query
       end
       
     private

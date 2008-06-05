@@ -156,29 +156,19 @@ module Viking
       #   the server can be very telling, so please include as much information 
       #   as possible.
       def call_akismet(akismet_function, options={})
-        http_post(
-          Net::HTTP.new([options[:api_key], self.class.host].join("."), options[:proxy_host], options[:proxy_port]), 
-          akismet_function, 
-          options.update(:blog => options[:blog]).to_query
-        )
+        http_post http_instance, akismet_function, options.update(:blog => options[:blog])
       end
 
       # Call to check and verify your API key. You may then call the 
       # <tt>verified?</tt> method to see if your key has been validated
       def verify_api_key
         return :false if invalid_options?
-        value = http_post(
-          Net::HTTP.new(self.class.host, self.class.port, options[:proxy_host], options[:proxy_port]), 
-          'verify-key', 
-          { 
-            :key  => options[:api_key], 
-            :blog => options[:blog] 
-          }.to_query
-        )
+        value = http_post http_instance, 'verify-key', :key  => options[:api_key], :blog => options[:blog]
         self.verified_key = (value == "valid") ? true : :false
       end
       
-      def http_post(http, action, data)
+      def http_post(http, action, options = {})
+        data = options.to_query
         resp = http.post(self.url(action), data, self.class.standard_headers)
         log_request(self.url(action), data, resp)
         resp.body
@@ -190,5 +180,11 @@ module Viking
       
     private
       attr_accessor :verified_key
+
+      def http_instance
+        Net::HTTP.new([options[:api_key], self.class.host].join("."), options[:proxy_host], options[:proxy_port])
+        http.read_timeout = http.open_timeout = Viking.timeout_threshold
+        http
+      end
   end
 end

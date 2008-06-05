@@ -22,10 +22,15 @@ module Viking
   class Error < StandardError; end
 
   class << self
+    attr_accessor :timeout_threshold
     attr_accessor :logger
     attr_accessor :default_engine
-    attr_accessor :connect_options
+    attr_writer   :connect_options
     attr_writer   :default_instance
+
+    def connect_options
+      @connect_options ||= {}
+    end
 
     def default_instance
       @default_instance ||= connect(default_engine, connect_options)
@@ -53,6 +58,8 @@ module Viking
       default_instance.mark_as_spam_or_ham(is_spam, options)
     end
   end
+
+  self.timeout_threshold = 5
 end
 
 require 'base'
