@@ -41,9 +41,10 @@ module Viking
     end
 
     def connect(engine, options)
-      unless engine.nil? || engine.empty?
+      engine = engine.to_s
+      unless engine.size.zero?
         require(engine)
-        Viking.const_get(engine.to_s.capitalize).new(options)
+        Viking.const_get(engine.capitalize).new(options)
       end
     end
 
